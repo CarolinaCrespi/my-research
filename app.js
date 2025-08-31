@@ -225,6 +225,11 @@ window.addEventListener('DOMContentLoaded', function(){
     ui[id].addEventListener('input',()=>{
       syncLabels();
       if(id==='ants' || id==='coop') rebuildAnts();
+      if (id === 'speed') {
+  const v = +ui.speed.value;
+  ants.forEach(a => { a.speed = v * (a.speedFactor || 1); });
+}
+
     });
   });
   syncLabels();
@@ -407,11 +412,18 @@ window.addEventListener('DOMContentLoaded', function(){
 
   function newAnt(type){
     const speed = +ui.speed.value; // px/s
-    const a = { type, node:startNode, last:-1, next:-1, t:0, edge:null, speed:speed*(0.85+rnd(0,0.3)), path:[], pathLen:0 };
+    //const a = { type, node:startNode, last:-1, next:-1, t:0, edge:null, speed:speed*(0.85+rnd(0,0.3)), path:[], pathLen:0 };
+    const base = 0.85 + Math.random()*0.3;           // fattore personale (varia tra ~0.85 e ~1.15)
+    const a = { type, node:startNode, last:-1, next:-1, t:0, edge:null,
+            speed: (+ui.speed.value) * base,      // velocità = slider × fattore
+            speedFactor: base,                    // lo memorizzo per aggiornamenti live
+            path:[], pathLen:0 };
+
     a.next = pickNext(a.node, a.last);
     a.edge = getEdge(a.node,a.next);
     a.t = 0;
     return a;
+
   }
 
   function rebuildAnts(){
